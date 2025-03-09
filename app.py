@@ -48,15 +48,11 @@ with col4:
 
 # Add maintenance crews row
 st.markdown("---")
-crew1, crew2, crew3, crew4 = st.columns(4)
+crew1, crew2 = st.columns(2)
 with crew1:
-    st.metric("North District Crews", "3")
+    st.metric("Technicians Deployed", "25")
 with crew2:
-    st.metric("South District Crews", "7")
-with crew3:
-    st.metric("East District Crews", "11")
-with crew4:
-    st.metric("West District Crews", "21")
+    st.metric("Crews Deployed", "3")
 st.markdown("---")
 
 # Search/Chatbot
