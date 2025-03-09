@@ -118,7 +118,6 @@ if user_input:
 
         # Add 10 technicians after receiving the response
         st.session_state.technicians_deployed += 10
-        st.rerun()
 
     except Exception as e:
         st.error(f"Error: {str(e)}")
