@@ -53,11 +53,13 @@ with col4:
 
 # Add maintenance crews row
 st.markdown("---")
-crew1, crew2 = st.columns(2)
+crew1, crew2, weather = st.columns(3)
 with crew1:
     st.metric("Technicians Deployed", str(st.session_state.technicians_deployed))
 with crew2:
     st.metric("Crews Deployed", str(st.session_state.crews_deployed))
+with weather:
+    st.metric("Weather conditions", "mostly sunny (58 F)")
 st.markdown("---")
 
 # Main layout
