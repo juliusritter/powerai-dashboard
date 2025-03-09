@@ -20,50 +20,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS
-st.markdown("""
-<style>
-    /* Main container */
-    .main .block-container {
-        padding-top: 2rem;
-        padding-bottom: 2rem;
-    }
-
-    /* Cards */
-    div[data-testid="stMetric"] {
-        background-color: #393E46;
-        padding: 1rem;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Metric labels */
-    div[data-testid="stMetricLabel"] {
-        font-size: 1rem !important;
-        color: #EEEEEE !important;
-    }
-
-    /* Metric values */
-    div[data-testid="stMetricValue"] {
-        font-size: 2rem !important;
-        color: #00ADB5 !important;
-    }
-
-    /* Headers */
-    h1, h2, h3 {
-        color: #EEEEEE !important;
-        font-weight: 600 !important;
-    }
-
-    /* Tables */
-    .stDataFrame {
-        background-color: #393E46;
-        border-radius: 10px;
-        padding: 1rem;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # Initialize session state
 if 'data' not in st.session_state:
     st.session_state.data = generate_sample_data()
@@ -139,10 +95,11 @@ with left_col:
 
     # Display data table with modern styling
     st.dataframe(
-        filtered_data.style.map(
-            lambda x: f'background-color: {"#2D4059" if x > 0.7 else "#395B64" if x > 0.5 else "#4F6F52"}' 
-            if isinstance(x, float) and pd.notnull(x) else '',
-            subset=['risk_score']
+        filtered_data.style.background_gradient(
+            subset=['risk_score'],
+            cmap='RdYlGn_r',
+            vmin=0,
+            vmax=1
         ),
         height=600,
         use_container_width=True
