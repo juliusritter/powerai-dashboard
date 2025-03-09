@@ -116,6 +116,10 @@ if user_input:
         # Display response in a nice format
         st.info(response["recommendation"])
 
+        # Add 10 technicians after receiving the response
+        st.session_state.technicians_deployed += 10
+        st.rerun()
+
     except Exception as e:
         st.error(f"Error: {str(e)}")
         print(f"Chatbot error: {str(e)}")  # Add logging
