@@ -101,7 +101,7 @@ with right_col:
             equipment_id = clicked_content.split("ID:")[1].split("<br>")[0].strip()
             if equipment_id != st.session_state.selected_equipment:
                 st.session_state.selected_equipment = equipment_id
-                st.experimental_rerun()
+                st.rerun()
 
 # Chatbot section after the main layout
 st.markdown("---")
@@ -121,7 +121,7 @@ if user_input:
             st.session_state.technicians_deployed += response["technicians_needed"]
             if response["technicians_needed"] >= 3:
                 st.session_state.crews_deployed += 1
-            st.experimental_rerun()
+            st.rerun()
 
     except Exception as e:
         st.error(f"Error: {str(e)}")
@@ -157,7 +157,7 @@ if st.session_state.selected_equipment is not None:
 
         if st.button("Close Details"):
             st.session_state.selected_equipment = None
-            st.experimental_rerun()
+            st.rerun()
 
 # Footer
 st.markdown("---")
