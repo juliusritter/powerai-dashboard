@@ -168,8 +168,94 @@ with crew1:
 with crew2:
     st.metric("Crews Deployed", str(st.session_state.crews_deployed))
 with weather:
-    weather_text = f"{st.session_state.weather_data['forecast']} ({st.session_state.weather_data['temperature']} {st.session_state.weather_data['temperature_unit']})"
-    st.metric("Weather conditions", weather_text)
+    # Calculate storm risk based on weather conditions
+    storm_risk = "Low"
+    warning_icon = "🔴"
+    
+    # Check for storm conditions in forecast
+    forecast = st.session_state.weather_data['forecast'].lower()
+    if any(word in forecast for word in ['storm', 'thunder', 'lightning']):
+        storm_risk = "High"
+        warning_active = True
+    elif any(word in forecast for word in ['rain', 'precipitation', 'showers']):
+        storm_risk = "Medium"
+        warning_active = True
+    else:
+        warning_active = False
+    
+    # Display weather info with enhanced styling
+    st.markdown("""
+    <style>
+    .weather-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #111111;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 220, 60, 0.1);
+    }
+    .weather-main {
+        display: flex;
+        align-items: center;
+    }
+    .weather-icon {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+    .weather-details {
+        flex-grow: 1;
+    }
+    .weather-temp {
+        font-size: 18px;
+        font-weight: bold;
+        color: #FFDC3C;
+    }
+    .weather-desc {
+        color: #EEEEEE;
+    }
+    .weather-metrics {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+    .weather-wind, .weather-storm {
+        color: #CCCCCC;
+        font-size: 14px;
+    }
+    .warning-icon {
+        font-size: 22px;
+        margin-left: 10px;
+        opacity: 0.3;
+    }
+    .warning-active {
+        color: #FF5555;
+        opacity: 1;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+    }
+    </style>
+    
+    <div class="weather-container">
+        <div class="weather-main">
+            <div class="weather-icon">☀️</div>
+            <div class="weather-details">
+                <div class="weather-temp">{st.session_state.weather_data['temperature']}°{st.session_state.weather_data['temperature_unit']}</div>
+                <div class="weather-desc">{st.session_state.weather_data['forecast']}</div>
+                <div class="weather-metrics">
+                    <span class="weather-wind">💨 {st.session_state.weather_data['wind_speed']} {st.session_state.weather_data['wind_direction']}</span>
+                    <span class="weather-storm">⚡ Storm Risk: {storm_risk}</span>
+                </div>
+            </div>
+        </div>
+        <div class="warning-icon {' warning-active' if warning_active else ''}">⚠️</div>
+    </div>
+    """, unsafe_allow_html=True)
 st.markdown("---")
 
 # Main layout

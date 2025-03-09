@@ -64,8 +64,26 @@ def calculate_weather_risk_factor(weather_data):
         elif any(word in condition for word in ['cloudy', 'overcast']):
             condition_risk = 0.3
         
+        # Wind speed risk
+        wind_risk = 0.0
+        try:
+            # Extract numeric wind speed (assuming format like "10 mph")
+            wind_speed_str = weather_data['wind_speed'].split()[0]
+            wind_speed = float(wind_speed_str)
+            
+            # Categorize wind risk
+            if wind_speed > 30:  # High wind
+                wind_risk = 1.0
+            elif wind_speed > 15:  # Moderate wind
+                wind_risk = 0.5
+            elif wind_speed > 8:  # Light wind
+                wind_risk = 0.2
+        except (ValueError, IndexError):
+            # If we can't parse wind speed, use a default value
+            wind_risk = 0.1
+        
         # Combine risks (weighted average)
-        total_risk = (temp_risk * 0.4) + (condition_risk * 0.6)
+        total_risk = (temp_risk * 0.3) + (condition_risk * 0.5) + (wind_risk * 0.2)
         return min(1.0, total_risk)
         
     except Exception as e:
