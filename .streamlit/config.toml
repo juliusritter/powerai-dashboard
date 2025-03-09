@@ -4,7 +4,11 @@ address = "0.0.0.0"
 port = 5000
 
 [theme]
-primaryColor = "#007bff"
-backgroundColor = "#ffffff"
-secondaryBackgroundColor = "#f8f9fa"
-textColor = "#262730"
+# Dark theme colors
+primaryColor = "#00ADB5"  # Teal accent
+backgroundColor = "#222831"  # Dark background
+secondaryBackgroundColor = "#393E46"  # Lighter dark
+textColor = "#EEEEEE"  # Light text
+
+[deprecation]
+showPyplotGlobalUse = false
