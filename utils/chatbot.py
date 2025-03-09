@@ -49,29 +49,28 @@ def get_chatbot_response(query, equipment_data):
         3. How many technicians should be deployed (1-5 based on complexity)
         4. Priority level of the maintenance
 
-        Response must be in this JSON format:
-        {{
-            "recommendation": "Detailed explanation of which equipment needs attention and why",
-            "technicians_needed": number between 1 and 5 (based on maintenance complexity),
-            "urgency_level": "high/medium/low"
-        }}
+        Be concise and direct in your response. Just tell me which equipment needs attention and how many technicians to send.
+        At the end of your response, state clearly how many technicians should be deployed (as a number between 1-5).
         """
 
         # Get response from OpenAI
         response = client.chat.completions.create(
             model="gpt-4o",  # the newest OpenAI model released May 13, 2024
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
+            messages=[{"role": "user", "content": prompt}]
         )
 
-        # Parse the JSON response
-        result = json.loads(response.choices[0].message.content)
+        # Get the text response
+        recommendation = response.choices[0].message.content
 
-        # Ensure required fields exist
-        if "recommendation" not in result or "technicians_needed" not in result:
-            raise ValueError("Invalid response format from AI")
+        # Extract the number of technicians needed (look for the last number 1-5 in the text)
+        import re
+        numbers = re.findall(r'\b[1-5]\b', recommendation)
+        technicians_needed = int(numbers[-1]) if numbers else 2  # Default to 2 if no number found
 
-        return result
+        return {
+            "recommendation": recommendation,
+            "technicians_needed": technicians_needed
+        }
 
     except Exception as e:
         print(f"Error in chatbot response: {str(e)}")  # Add logging
