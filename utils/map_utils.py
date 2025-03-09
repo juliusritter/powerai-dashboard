@@ -27,16 +27,33 @@ def create_equipment_map(data):
             else:
                 color = 'red'
 
-            # Create popup content
+            # Determine possible outage reason
+            reasons = []
+            if equipment['age'] > 15:
+                reasons.append("Equipment Age")
+            if equipment['days_since_maintenance'] > 180:
+                reasons.append("Maintenance Overdue")
+            if equipment['vegetation_proximity']:
+                reasons.append("Vegetation Proximity")
+            if equipment['temperature'] > 85:
+                reasons.append("High Temperature")
+            if equipment['precipitation_forecast'] > 30:
+                reasons.append("Heavy Precipitation")
+
+            outage_reason = " & ".join(reasons) if reasons else "No immediate risks"
+
+            # Create popup content with HTML
             popup_content = f"""
-            <div style='font-family: Arial, sans-serif; min-width: 150px;'>
-                <strong>{equipment['product_name']}</strong><br>
-                ID: {equipment['product_id']}<br>
-                Risk Score: {equipment['risk_score']:.2f}
+            <div style='font-family: Arial, sans-serif; min-width: 200px;'>
+                <strong style='font-size: 16px;'>{equipment['product_name']}</strong><br>
+                <hr style='margin: 5px 0;'>
+                <strong>Risk Score:</strong> {equipment['risk_score']:.2f}<br>
+                <strong>Possible Outage:</strong> {outage_reason}<br>
+                <strong>Customers Impacted:</strong> {equipment['customer_impact']:,}
             </div>
             """
 
-            # Add marker using Marker instead of CircleMarker
+            # Add marker
             folium.Marker(
                 location=[equipment['latitude'], equipment['longitude']],
                 popup=popup_content,
