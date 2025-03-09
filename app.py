@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-import plotly.express as px
 from datetime import datetime
 import numpy as np
 
@@ -93,14 +92,9 @@ with left_col:
         st.session_state.data['product_id'].str.contains(search, case=False)
     ] if search else st.session_state.data
 
-    # Display data table with modern styling
+    # Display data table
     st.dataframe(
-        filtered_data.style.background_gradient(
-            subset=['risk_score'],
-            cmap='RdYlGn_r',
-            vmin=0,
-            vmax=1
-        ),
+        filtered_data,
         height=600,
         use_container_width=True
     )

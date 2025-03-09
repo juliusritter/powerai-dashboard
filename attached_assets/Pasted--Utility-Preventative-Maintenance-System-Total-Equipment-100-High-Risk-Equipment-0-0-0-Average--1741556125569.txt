@@ -1,0 +1,59 @@
+
+⚡ Utility Preventative Maintenance System
+Total Equipment
+
+100
+High Risk Equipment
+
+0
+0.0%
+Average Equipment Age
+
+5.5 years
+Total Customer Coverage
+
+50,643
+🔍 Search Equipment
+
+Enter ID or name...
+ImportError: background_gradient requires matplotlib.
+Traceback:
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 121, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 593, in code_to_exec
+    exec(code, module.__dict__)
+File "/home/runner/workspace/app.py", line 97, in <module>
+    st.dataframe(
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 410, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/arrow.py", line 600, in dataframe
+    marshall_styler(proto, data, default_uuid)
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/lib/pandas_styler_utils.py", line 62, in marshall_styler
+    styler._compute()
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/io/formats/style_render.py", line 256, in _compute
+    r = func(self)(*args, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/io/formats/style.py", line 1726, in _apply
+    result = data.apply(func, axis=0, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/frame.py", line 10374, in apply
+    return op.apply().__finalize__(self, method="apply")
+           ^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/apply.py", line 916, in apply
+    return self.apply_standard()
+           ^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/apply.py", line 1063, in apply_standard
+    results, res_index = self.apply_series_generator()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/core/apply.py", line 1081, in apply_series_generator
+    results[i] = self.func(v, *self.args, **self.kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/io/formats/style.py", line 3806, in _background_gradient
+    with _mpl(Styler.background_gradient) as (_, _matplotlib):
+File "/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/pandas/io/formats/style.py", line 98, in _mpl
+    raise ImportError(f"{func.__name__} requires matplotlib.")
