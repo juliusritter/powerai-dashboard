@@ -5,10 +5,11 @@ port = 5000
 
 [theme]
 # Dark theme colors
-primaryColor = "#00ADB5"  # Teal accent
-backgroundColor = "#222831"  # Dark background
-secondaryBackgroundColor = "#393E46"  # Lighter dark
-textColor = "#EEEEEE"  # Light text
+primaryColor = "#FFDC3C"  # Bright yellow accent
+backgroundColor = "#000000"  # Deep black
+secondaryBackgroundColor = "#111111"  # Slightly lighter black for cards
+textColor = "#FFFFFF"  # White text
+font = "sans-serif"
 
 [deprecation]
 showPyplotGlobalUse = false

@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import st_folium
 from datetime import datetime
 import numpy as np
-import requests # Added for NOAA API access
+import requests
 
 from utils.data_processing import load_and_process_data
 from utils.predictions import calculate_risk_score, get_risk_level
@@ -12,15 +12,117 @@ from utils.cost_analysis import calculate_cost_impact
 from utils.map_utils import create_equipment_map
 from utils.chatbot import get_chatbot_response
 from data.sample_data import generate_sample_data
-from utils.weather_utils import fetch_noaa_weather # Added import for weather utility
+from utils.weather_utils import fetch_noaa_weather
 
 # Page config must be the first Streamlit command
 st.set_page_config(
-    page_title="Utility Preventative Maintenance System",
+    page_title="Power.AI - Grid Infrastructure",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Custom CSS
+st.markdown("""
+<style>
+    /* Main container */
+    .stApp {
+        background-color: #000000;
+    }
+
+    /* Headers */
+    h1, h2, h3 {
+        color: #FFDC3C !important;
+        font-family: 'SF Pro Display', sans-serif;
+    }
+
+    /* Metrics */
+    .stMetric {
+        background-color: #111111;
+        border-radius: 15px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 220, 60, 0.1);
+    }
+    .stMetric:hover {
+        border: 1px solid rgba(255, 220, 60, 0.3);
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    .stMetric label {
+        color: #CCCCCC !important;
+    }
+    .stMetric .metric-value {
+        color: #FFDC3C !important;
+        font-weight: bold;
+    }
+
+    /* Buttons */
+    .stButton button {
+        background-color: #FFDC3C !important;
+        color: #000000 !important;
+        font-weight: bold;
+        border-radius: 10px;
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+    .stButton button:hover {
+        background-color: #FFE461 !important;
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+
+    /* Input fields */
+    .stTextInput input {
+        background-color: #111111;
+        border: 1px solid rgba(255, 220, 60, 0.2);
+        border-radius: 10px;
+        color: white;
+    }
+    .stTextInput input:focus {
+        border-color: #FFDC3C;
+        box-shadow: 0 0 0 2px rgba(255, 220, 60, 0.2);
+    }
+
+    /* DataFrames */
+    .dataframe {
+        background-color: #111111 !important;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 220, 60, 0.1);
+    }
+
+    /* Custom logo and title */
+    .logo-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .logo-title img {
+        width: 50px;
+        height: 50px;
+    }
+    .tagline {
+        color: #CCCCCC;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        margin-bottom: 2rem;
+    }
+</style>
+
+<!-- Logo and Title -->
+<div class="logo-title">
+    <svg width="50" height="50" viewBox="0 0 50 50">
+        <path d="M25 2L10 40H24L20 48L40 18H26L35 2H25Z" 
+              fill="#FFDC3C" 
+              stroke="#FFDC3C" 
+              stroke-width="2"/>
+    </svg>
+    <h1>Power.AI</h1>
+</div>
+<div class="tagline">
+    EARLY WARNING SYSTEM FOR GRID INFRASTRUCTURE
+</div>
+""", unsafe_allow_html=True)
 
 # Initialize session state
 if 'data' not in st.session_state:
@@ -32,7 +134,6 @@ if 'technicians_deployed' not in st.session_state:
 if 'crews_deployed' not in st.session_state:
     st.session_state.crews_deployed = 3
 if 'weather_data' not in st.session_state:
-    # Get weather for San Francisco as default
     st.session_state.weather_data = fetch_noaa_weather(37.7749, -122.4194)
 
 # Update weather every 30 minutes
@@ -42,9 +143,6 @@ elif (datetime.now() - st.session_state.last_weather_update).total_seconds() > 1
     st.session_state.weather_data = fetch_noaa_weather(37.7749, -122.4194)
     st.session_state.last_weather_update = datetime.now()
 
-# Header with metrics
-st.title("⚡ Utility Preventative Maintenance System")
-
 # Top metrics row
 col1, col2, col3, col4 = st.columns(4)
 with col1:
@@ -52,7 +150,6 @@ with col1:
     st.metric("Total Equipment", f"{total_equipment:,}")
 
 with col2:
-    # Set network resilience to fixed 70%
     st.metric("Network Resilience", "70.0%")
 
 with col3:
