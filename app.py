@@ -9,6 +9,7 @@ from utils.data_processing import load_and_process_data
 from utils.predictions import calculate_risk_score, get_risk_level
 from utils.cost_analysis import calculate_cost_impact
 from utils.map_utils import create_equipment_map
+from utils.chatbot import get_chatbot_response
 from data.sample_data import generate_sample_data
 
 # Page config must be the first Streamlit command
@@ -24,6 +25,10 @@ if 'data' not in st.session_state:
     st.session_state.data = generate_sample_data()
 if 'selected_equipment' not in st.session_state:
     st.session_state.selected_equipment = None
+if 'technicians_deployed' not in st.session_state:
+    st.session_state.technicians_deployed = 25
+if 'crews_deployed' not in st.session_state:
+    st.session_state.crews_deployed = 3
 
 # Header with metrics
 st.title("⚡ Utility Preventative Maintenance System")
@@ -50,13 +55,37 @@ with col4:
 st.markdown("---")
 crew1, crew2 = st.columns(2)
 with crew1:
-    st.metric("Technicians Deployed", "25")
+    st.metric("Technicians Deployed", str(st.session_state.technicians_deployed))
 with crew2:
-    st.metric("Crews Deployed", "3")
+    st.metric("Crews Deployed", str(st.session_state.crews_deployed))
 st.markdown("---")
 
 # Search/Chatbot
-search = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
+user_input = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
+
+# Process chatbot input
+if user_input:
+    try:
+        # Get AI response
+        response = get_chatbot_response(user_input, st.session_state.data)
+
+        # Display response in a nice format
+        st.info(response["recommendation"])
+
+        # Highlight recommended equipment
+        if response["selected_equipment"]:
+            st.session_state.selected_equipment = response["selected_equipment"]
+
+            # Update deployment numbers based on recommendation
+            st.session_state.technicians_deployed += response["technicians_needed"]
+            if response["technicians_needed"] >= 3:
+                st.session_state.crews_deployed += 1
+
+            # Force refresh to update metrics
+            st.experimental_rerun()
+
+    except Exception as e:
+        st.error(f"Sorry, I couldn't process that request. Please try again.")
 
 
 # Sidebar for equipment details
@@ -98,9 +127,9 @@ left_col, right_col = st.columns([1,1])
 with left_col:
     # Filter data based on search
     filtered_data = st.session_state.data[
-        st.session_state.data['product_name'].str.contains(search, case=False) |
-        st.session_state.data['product_id'].str.contains(search, case=False)
-    ] if search else st.session_state.data
+        st.session_state.data['product_name'].str.contains(user_input, case=False) |
+        st.session_state.data['product_id'].str.contains(user_input, case=False)
+    ] if user_input else st.session_state.data
 
     # Display data table
     st.dataframe(
