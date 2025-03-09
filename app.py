@@ -46,6 +46,23 @@ with col4:
     total_customers = st.session_state.data['customer_impact'].sum()
     st.metric("Total Customer Coverage", f"{total_customers:,}")
 
+# Add maintenance crews row
+st.markdown("---")
+crew1, crew2, crew3, crew4 = st.columns(4)
+with crew1:
+    st.metric("North District Crews", "3")
+with crew2:
+    st.metric("South District Crews", "7")
+with crew3:
+    st.metric("East District Crews", "11")
+with crew4:
+    st.metric("West District Crews", "21")
+st.markdown("---")
+
+# Search/Chatbot
+search = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
+
+
 # Sidebar for equipment details
 if st.session_state.selected_equipment is not None:
     with st.sidebar:
@@ -83,9 +100,6 @@ left_col, right_col = st.columns([1,1])
 
 # Left Panel - Data Overview
 with left_col:
-    # Search and filter
-    search = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
-
     # Filter data based on search
     filtered_data = st.session_state.data[
         st.session_state.data['product_name'].str.contains(search, case=False) |
