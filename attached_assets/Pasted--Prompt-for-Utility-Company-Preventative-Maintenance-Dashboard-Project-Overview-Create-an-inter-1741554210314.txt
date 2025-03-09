@@ -1,0 +1,154 @@
+# Prompt for Utility Company Preventative Maintenance Dashboard
+
+## Project Overview
+Create an interactive dashboard for electricity utility company operators focused on preventative maintenance and cost savings estimation. The dashboard should predict equipment failures based on historical data and environmental factors, allowing operators to take proactive measures and understand potential cost impacts.
+
+## Core Functionality Requirements
+
+### Data Integration
+Build a system that processes and visualizes the following data points for each piece of equipment:
+- Product ID (unique identifier for equipment like poles)
+- Product name/type
+- GPS location (latitude and longitude)
+- Pole number (for map reference)
+- Installation date
+- Last maintenance date
+- Current temperature (Fahrenheit)
+- Precipitation forecast (mm for next 7 days)
+- Vegetation proximity flag (binary: Yes/No)
+- Customer impact count (number of customers affected if equipment fails)
+
+### Dashboard Layout
+
+1. **Main Header**
+   - Dashboard title: "Utility Preventative Maintenance System"
+   - Current date/time
+   - Weather alert system in top-right corner
+   - User login/profile information
+
+2. **Left Panel - Data Overview**
+   - Sortable and filterable table showing all equipment with columns matching the data points listed above
+   - Quick search functionality
+   - Color-coded risk indicators
+   - Pagination or infinite scroll for large datasets
+   - Export functionality (CSV/PDF)
+
+3. **Right Panel - Interactive Map**
+   - Zoomable geographic map showing all infrastructure elements
+   - Color-coded pins representing different equipment types and risk levels
+     - Green: Low risk
+     - Yellow: Medium risk
+     - Orange: High risk
+     - Red: Critical risk/Immediate attention required
+   - Clustering for dense areas
+   - Layer toggles for different equipment types
+   - Weather overlay option
+
+4. **Detail Panel (appears when equipment is selected)**
+   - Equipment specifications
+   - Historical maintenance records
+   - Failure probability metrics:
+     - 7-day outage probability (percentage)
+     - 30-day outage probability (percentage)
+   - Estimated cost analysis:
+     - Preventative maintenance cost
+     - Reactive repair cost (if failure occurs)
+     - Potential savings
+     - Customer impact cost
+   - Recommended maintenance schedule
+   - Historical images if available
+
+5. **Top-Right Alert System**
+   - Storm warnings with severity indicators
+   - Automatic highlighting of equipment in storm path
+   - Countdown timer to expected weather events
+   - Impact severity estimation
+
+### Predictive Analytics Requirements
+
+Implement machine learning models that:
+1. Calculate failure probabilities based on:
+   - Equipment age
+   - Time since last maintenance
+   - Weather conditions (temperature extremes, precipitation)
+   - Vegetation proximity
+   - Historical failure rates for similar equipment
+
+2. Estimate cost impacts:
+   - Repair/replacement costs
+   - Labor costs
+   - Customer outage costs (based on number of affected customers)
+   - Regulatory penalties
+   - Reputation damage estimates
+
+3. Generate maintenance recommendations:
+   - Prioritized list of equipment needing attention
+   - Optimal maintenance scheduling
+   - Resource allocation suggestions
+
+## Technical Implementation Guidelines
+
+### Frontend
+- Build a responsive UI that works on both desktop and mobile devices
+- Implement a modern framework (React, Vue, or Angular)
+- Use a mapping library that supports:
+  - Custom markers
+  - Clustering
+  - Polygon drawing
+  - Weather data overlay
+- Create smooth transitions and intuitive interactions
+- Design a clean, professional interface with clear information hierarchy
+
+### Backend
+- Develop RESTful API endpoints for data retrieval and processing
+- Implement real-time data processing where appropriate
+- Create efficient database schema for storing equipment and historical data
+- Build integration with weather APIs for forecast data
+- Implement secure authentication and authorization
+
+### Machine Learning Component
+- Train models on historical equipment failure data
+- Include weather pattern correlations
+- Account for maintenance history impact
+- Implement feature importance analysis to explain predictions
+- Create retraining pipeline for model improvement over time
+
+### Data Processing
+- Implement data cleansing and normalization procedures
+- Create ETL pipelines for integrating diverse data sources
+- Set up logging and monitoring for data quality
+- Develop anomaly detection for equipment readings
+
+## Sample Code Structure
+
+Include starter code with:
+1. Basic UI layout and components
+2. Data model definitions
+3. API endpoint structure
+4. Predictive model implementation skeleton
+5. Authentication system
+
+## Deployment Instructions
+Provide clear instructions for deploying the solution using Groq Cloud or Replit, including:
+- Environment setup
+- Dependencies installation
+- Configuration options
+- Database initialization
+- Security best practices
+
+## Testing Guidelines
+Include comprehensive testing strategies for:
+- Frontend components
+- Backend services
+- Predictive models
+- Data processing pipelines
+- Security vulnerabilities
+
+## Future Enhancement Roadmap
+Suggest potential future enhancements:
+- Mobile app integration
+- Drone inspection data incorporation
+- IoT sensor integration
+- Automated work order generation
+- Crew dispatch optimization
+- Customer notification system
