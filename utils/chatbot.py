@@ -22,22 +22,21 @@ def get_chatbot_response(query, equipment_data):
 
         # Create the prompt
         prompt = f"""
-        You are a utility maintenance advisor. Analyze the following equipment data and {query}
-        
+        You are a utility maintenance advisor. Based on the provided equipment data, {query}
+
         Consider these factors when making recommendations:
         1. Risk score (higher means more urgent)
         2. Days since last maintenance
         3. Number of customers impacted
-        
+
         Equipment data:
-        {json.dumps(equipment_list, indent=2)}
-        
+        {json.dumps(equipment_list[:5], indent=2)}  # Limiting to 5 items to avoid token limits
+
         Provide a response in this JSON format:
         {{
             "recommendation": "Your detailed recommendation here",
-            "selected_equipment": "product_id of the recommended equipment",
-            "urgency_level": "high/medium/low",
-            "technicians_needed": number between 1 and 5
+            "technicians_needed": number between 1 and 5,
+            "urgency_level": "high/medium/low"
         }}
         """
 
@@ -50,7 +49,13 @@ def get_chatbot_response(query, equipment_data):
 
         # Parse the JSON response
         result = json.loads(response.choices[0].message.content)
+
+        # Ensure required fields exist
+        if "recommendation" not in result or "technicians_needed" not in result:
+            raise ValueError("Invalid response format from AI")
+
         return result
 
     except Exception as e:
+        print(f"Error in chatbot response: {str(e)}")  # Add logging
         raise Exception(f"Error getting chatbot response: {str(e)}")

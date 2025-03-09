@@ -117,14 +117,15 @@ if user_input:
         st.info(response["recommendation"])
 
         # Update deployment numbers based on recommendation
-        if response.get("technicians_needed"):
+        if "technicians_needed" in response:
             st.session_state.technicians_deployed += response["technicians_needed"]
             if response["technicians_needed"] >= 3:
                 st.session_state.crews_deployed += 1
             st.experimental_rerun()
 
     except Exception as e:
-        st.error(f"Sorry, I couldn't process that request. Please try again.")
+        st.error(f"Error: {str(e)}")
+        print(f"Chatbot error: {str(e)}")  # Add logging
 
 # Sidebar for equipment details
 if st.session_state.selected_equipment is not None:
