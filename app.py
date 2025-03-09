@@ -116,13 +116,6 @@ if user_input:
         # Display response in a nice format
         st.info(response["recommendation"])
 
-        # Update deployment numbers based on recommendation
-        if "technicians_needed" in response:
-            st.session_state.technicians_deployed += response["technicians_needed"]
-            if response["technicians_needed"] >= 3:
-                st.session_state.crews_deployed += 1
-            st.rerun()
-
     except Exception as e:
         st.error(f"Error: {str(e)}")
         print(f"Chatbot error: {str(e)}")  # Add logging
