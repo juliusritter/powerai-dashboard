@@ -27,22 +27,25 @@ def create_equipment_map(data):
             else:
                 color = 'red'
 
-            # Create popup content
+            # Create popup content with HTML
             popup_content = f"""
-                <b>{equipment['product_name']}</b><br>
-                ID: {equipment['product_id']}<br>
-                Risk Score: {equipment['risk_score']:.2f}<br>
-                Customers: {equipment['customer_impact']}
+            <div style='font-family: Arial, sans-serif;'>
+                <strong>{equipment['product_name']}</strong><br>
+                <strong>ID:</strong> {equipment['product_id']}<br>
+                <strong>Risk:</strong> {equipment['risk_score']:.2f}
+            </div>
             """
 
-            # Add marker
+            # Add marker with custom popup
             folium.CircleMarker(
                 location=[equipment['latitude'], equipment['longitude']],
                 radius=8,
-                popup=folium.Popup(popup_content, max_width=300),
+                popup=folium.Popup(popup_content, max_width=250),
+                tooltip=f"{equipment['product_name']} - {equipment['product_id']}",
                 color=color,
                 fill=True,
-                fill_color=color
+                fill_color=color,
+                fill_opacity=0.7,
             ).add_to(m)
 
         return m

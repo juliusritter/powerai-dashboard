@@ -133,13 +133,6 @@ with left_col:
         st.session_state.data['product_id'].str.contains(search, case=False)
     ] if search else st.session_state.data
 
-    # Risk level filter
-    risk_levels = ['All'] + sorted(filtered_data['risk_score'].apply(get_risk_level).unique().tolist())
-    selected_risk = st.selectbox("Filter by Risk Level", risk_levels)
-
-    if selected_risk != 'All':
-        filtered_data = filtered_data[filtered_data['risk_score'].apply(get_risk_level) == selected_risk]
-
     # Display data table with modern styling
     st.dataframe(
         filtered_data.style.map(
@@ -154,21 +147,27 @@ with left_col:
 # Right Panel - Map
 with right_col:
     st.subheader("📍 Equipment Location Map")
+
+    # Create and display the map with click events
+    map_data = create_equipment_map(filtered_data)
     map_events = st_folium(
-        create_equipment_map(filtered_data),
+        map_data,
         height=600,
         width=None,
-        returned_objects=["last_object_clicked"]
+        returned_objects=["last_active_drawing", "all_drawings", "last_clicked"]
     )
 
     # Handle map click events
-    if map_events["last_object_clicked"]:
-        clicked_popup = map_events["last_object_clicked"].get("popup", "")
-        if clicked_popup:
-            # Extract equipment ID from popup content
-            equipment_id = clicked_popup.split("ID: ")[1].split("<br>")[0]
-            st.session_state.selected_equipment = equipment_id
-            st.experimental_rerun()
+    if (map_events["last_clicked"] and 
+        isinstance(map_events["last_clicked"], dict) and 
+        "popup" in map_events["last_clicked"]):
+
+        popup_content = map_events["last_clicked"]["popup"]
+        if "ID:" in popup_content:
+            equipment_id = popup_content.split("ID:")[1].split("<br>")[0].strip()
+            if equipment_id != st.session_state.selected_equipment:
+                st.session_state.selected_equipment = equipment_id
+                st.experimental_rerun()
 
 # Footer
 st.markdown("---")
