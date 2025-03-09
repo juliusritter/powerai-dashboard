@@ -92,8 +92,8 @@ with col4:
     st.metric("Total Customer Coverage", f"{total_customers:,}")
 
 # Sidebar for equipment details
-with st.sidebar:
-    if st.session_state.selected_equipment is not None:
+if st.session_state.selected_equipment is not None:
+    with st.sidebar:
         equipment = st.session_state.data[
             st.session_state.data['product_id'] == st.session_state.selected_equipment
         ].iloc[0]
@@ -118,6 +118,10 @@ with st.sidebar:
                 "Repair Cost",
                 f"${cost_impact['repair_cost']:,.0f}"
             )
+
+        if st.button("Close Details"):
+            st.session_state.selected_equipment = None
+            st.experimental_rerun()
 
 # Main layout
 left_col, right_col = st.columns([1,1])
@@ -154,17 +158,14 @@ with right_col:
         map_data,
         height=600,
         width=None,
-        returned_objects=["last_active_drawing", "all_drawings", "last_clicked"]
+        returned_objects=["last_clicked"]
     )
 
     # Handle map click events
-    if (map_events["last_clicked"] and 
-        isinstance(map_events["last_clicked"], dict) and 
-        "popup" in map_events["last_clicked"]):
-
-        popup_content = map_events["last_clicked"]["popup"]
-        if "ID:" in popup_content:
-            equipment_id = popup_content.split("ID:")[1].split("<br>")[0].strip()
+    if map_events["last_clicked"] and isinstance(map_events["last_clicked"], dict):
+        clicked_content = map_events["last_clicked"].get("popup", "")
+        if "ID:" in clicked_content:
+            equipment_id = clicked_content.split("ID:")[1].split("<br>")[0].strip()
             if equipment_id != st.session_state.selected_equipment:
                 st.session_state.selected_equipment = equipment_id
                 st.experimental_rerun()

@@ -27,12 +27,12 @@ def create_equipment_map(data):
             else:
                 color = 'red'
 
-            # Create popup content with HTML
+            # Create popup content with HTML - keep ID format consistent for parsing
             popup_content = f"""
             <div style='font-family: Arial, sans-serif;'>
                 <strong>{equipment['product_name']}</strong><br>
                 <strong>ID:</strong> {equipment['product_id']}<br>
-                <strong>Risk:</strong> {equipment['risk_score']:.2f}
+                <strong>Risk Score:</strong> {equipment['risk_score']:.2f}
             </div>
             """
 
