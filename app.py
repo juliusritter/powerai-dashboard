@@ -35,10 +35,8 @@ with col1:
     st.metric("Total Equipment", f"{total_equipment:,}")
 
 with col2:
-    # Calculate network resilience as inverse of high risk percentage
-    high_risk = len(st.session_state.data[st.session_state.data['risk_score'] >= 0.7])
-    resilience_percentage = ((total_equipment - high_risk) / total_equipment) * 100
-    st.metric("Network Resilience", f"{resilience_percentage:.1f}%")
+    # Set network resilience to fixed 70%
+    st.metric("Network Resilience", "70.0%")
 
 with col3:
     avg_age = st.session_state.data['age'].mean()
