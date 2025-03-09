@@ -4,6 +4,7 @@ import folium
 from streamlit_folium import st_folium
 from datetime import datetime
 import numpy as np
+import requests # Added for NOAA API access
 
 from utils.data_processing import load_and_process_data
 from utils.predictions import calculate_risk_score, get_risk_level
@@ -11,6 +12,7 @@ from utils.cost_analysis import calculate_cost_impact
 from utils.map_utils import create_equipment_map
 from utils.chatbot import get_chatbot_response
 from data.sample_data import generate_sample_data
+from utils.weather_utils import fetch_noaa_weather # Added import for weather utility
 
 # Page config must be the first Streamlit command
 st.set_page_config(
@@ -29,6 +31,16 @@ if 'technicians_deployed' not in st.session_state:
     st.session_state.technicians_deployed = 25
 if 'crews_deployed' not in st.session_state:
     st.session_state.crews_deployed = 3
+if 'weather_data' not in st.session_state:
+    # Get weather for San Francisco as default
+    st.session_state.weather_data = fetch_noaa_weather(37.7749, -122.4194)
+
+# Update weather every 30 minutes
+if 'last_weather_update' not in st.session_state:
+    st.session_state.last_weather_update = datetime.now()
+elif (datetime.now() - st.session_state.last_weather_update).total_seconds() > 1800:
+    st.session_state.weather_data = fetch_noaa_weather(37.7749, -122.4194)
+    st.session_state.last_weather_update = datetime.now()
 
 # Header with metrics
 st.title("⚡ Utility Preventative Maintenance System")
@@ -59,7 +71,8 @@ with crew1:
 with crew2:
     st.metric("Crews Deployed", str(st.session_state.crews_deployed))
 with weather:
-    st.metric("Weather conditions", "mostly sunny (58 F)")
+    weather_text = f"{st.session_state.weather_data['forecast']} ({st.session_state.weather_data['temperature']} {st.session_state.weather_data['temperature_unit']})"
+    st.metric("Weather conditions", weather_text)
 st.markdown("---")
 
 # Main layout
@@ -71,10 +84,17 @@ with left_col:
     search = st.text_input("🔍 Search Equipment", placeholder="Enter ID or name to filter the table...")
 
     # Filter data based on search
-    filtered_data = st.session_state.data[
-        st.session_state.data['product_name'].str.contains(search, case=False) |
-        st.session_state.data['product_id'].str.contains(search, case=False)
-    ] if search else st.session_state.data
+    filtered_data = st.session_state.data.copy() #create a copy to avoid modifying original data
+    if search:
+        filtered_data = filtered_data[
+            filtered_data['product_name'].str.contains(search, case=False) |
+            filtered_data['product_id'].str.contains(search, case=False)
+        ]
+
+    # Update risk calculations in the data processing
+    for idx, row in filtered_data.iterrows():
+        filtered_data.at[idx, 'risk_score'] = calculate_risk_score(row, st.session_state.weather_data)
+
 
     # Display data table
     st.dataframe(
