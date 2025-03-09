@@ -3,7 +3,6 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import plotly.express as px
-import plotly.graph_objects as go
 from datetime import datetime
 import numpy as np
 
@@ -18,7 +17,7 @@ st.set_page_config(
     page_title="Utility Preventative Maintenance System",
     page_icon="⚡",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Custom CSS
@@ -68,6 +67,8 @@ st.markdown("""
 # Initialize session state
 if 'data' not in st.session_state:
     st.session_state.data = generate_sample_data()
+if 'selected_equipment' not in st.session_state:
+    st.session_state.selected_equipment = None
 
 # Header with metrics
 st.title("⚡ Utility Preventative Maintenance System")
@@ -90,10 +91,38 @@ with col4:
     total_customers = st.session_state.data['customer_impact'].sum()
     st.metric("Total Customer Coverage", f"{total_customers:,}")
 
-# Main layout
-left_col, right_col = st.columns([2,1])
+# Sidebar for equipment details
+with st.sidebar:
+    if st.session_state.selected_equipment is not None:
+        equipment = st.session_state.data[
+            st.session_state.data['product_id'] == st.session_state.selected_equipment
+        ].iloc[0]
 
-# Left Panel - Data Overview and Map
+        st.title(f"📋 Equipment Details")
+        st.write(f"**ID:** {equipment['product_id']}")
+        st.write(f"**Product Name:** {equipment['product_name']}")
+        st.write(f"**Installation Date:** {equipment['installation_date'].strftime('%Y-%m-%d')}")
+        st.write(f"**Last Maintenance:** {equipment['last_maintenance_date'].strftime('%Y-%m-%d')}")
+        st.write(f"**Customer Impact:** {equipment['customer_impact']:,} customers")
+
+        st.subheader("💰 Cost Analysis")
+        cost_impact = calculate_cost_impact(equipment)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric(
+                "Preventative Cost",
+                f"${cost_impact['preventative_cost']:,.0f}"
+            )
+        with col2:
+            st.metric(
+                "Repair Cost",
+                f"${cost_impact['repair_cost']:,.0f}"
+            )
+
+# Main layout
+left_col, right_col = st.columns([1,1])
+
+# Left Panel - Data Overview
 with left_col:
     # Search and filter
     search = st.text_input("🔍 Search Equipment", placeholder="Enter ID or name...")
@@ -118,90 +147,28 @@ with left_col:
             if isinstance(x, float) and pd.notnull(x) else '',
             subset=['risk_score']
         ),
-        height=300,
+        height=600,
         use_container_width=True
     )
 
-    # Map
-    st.subheader("📍 Equipment Location Map")
-    map_data = create_equipment_map(filtered_data)
-    st_folium(map_data, height=400, width=None)
-
-# Right Panel - Equipment Details and Analytics
+# Right Panel - Map
 with right_col:
-    st.subheader("📊 Equipment Analysis")
-
-    selected_id = st.selectbox(
-        "Select Equipment ID",
-        options=filtered_data['product_id'].unique(),
-        format_func=lambda x: f"{x} - {filtered_data[filtered_data['product_id']==x].iloc[0]['product_name']}"
+    st.subheader("📍 Equipment Location Map")
+    map_events = st_folium(
+        create_equipment_map(filtered_data),
+        height=600,
+        width=None,
+        returned_objects=["last_object_clicked"]
     )
 
-    if selected_id:
-        equipment = filtered_data[filtered_data['product_id'] == selected_id].iloc[0]
-
-        # Risk score gauge
-        fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = equipment['risk_score'],
-            gauge = {
-                'axis': {'range': [0, 1], 'tickcolor': "#EEEEEE"},
-                'bar': {'color': "#00ADB5"},
-                'steps': [
-                    {'range': [0, 0.3], 'color': "#4F6F52"},
-                    {'range': [0.3, 0.7], 'color': "#395B64"},
-                    {'range': [0.7, 1], 'color': "#2D4059"}
-                ]
-            },
-            title = {'text': "Risk Score", 'font': {'color': "#EEEEEE"}}
-        ))
-        fig.update_layout(
-            paper_bgcolor = "rgba(0,0,0,0)",
-            plot_bgcolor = "rgba(0,0,0,0)",
-            height=200
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-        # Equipment details in expandable sections
-        with st.expander("📋 Equipment Details", expanded=True):
-            st.write(f"**Product Name:** {equipment['product_name']}")
-            st.write(f"**Installation Date:** {equipment['installation_date'].strftime('%Y-%m-%d')}")
-            st.write(f"**Last Maintenance:** {equipment['last_maintenance_date'].strftime('%Y-%m-%d')}")
-            st.write(f"**Customer Impact:** {equipment['customer_impact']:,} customers")
-
-        with st.expander("💰 Cost Analysis", expanded=True):
-            cost_impact = calculate_cost_impact(equipment)
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric(
-                    "Preventative Cost",
-                    f"${cost_impact['preventative_cost']:,.0f}",
-                    delta="-"
-                )
-            with col2:
-                st.metric(
-                    "Repair Cost",
-                    f"${cost_impact['repair_cost']:,.0f}",
-                    delta=f"${cost_impact['savings']:,.0f} savings",
-                    delta_color="inverse"
-                )
-
-        # Historical trend with improved styling
-        st.subheader("📈 Risk Score Trend")
-        trend_data = pd.DataFrame({
-            'date': pd.date_range(end=pd.Timestamp.now(), periods=30, freq='D'),
-            'risk_score': np.random.normal(equipment['risk_score'], 0.1, 30).clip(0, 1)
-        })
-
-        fig = px.line(trend_data, x='date', y='risk_score')
-        fig.update_layout(
-            paper_bgcolor = "rgba(0,0,0,0)",
-            plot_bgcolor = "rgba(0,0,0,0)",
-            font = {'color': "#EEEEEE"},
-            xaxis = {'gridcolor': "#393E46"},
-            yaxis = {'gridcolor': "#393E46"}
-        )
-        st.plotly_chart(fig, use_container_width=True)
+    # Handle map click events
+    if map_events["last_object_clicked"]:
+        clicked_popup = map_events["last_object_clicked"].get("popup", "")
+        if clicked_popup:
+            # Extract equipment ID from popup content
+            equipment_id = clicked_popup.split("ID: ")[1].split("<br>")[0]
+            st.session_state.selected_equipment = equipment_id
+            st.experimental_rerun()
 
 # Footer
 st.markdown("---")
