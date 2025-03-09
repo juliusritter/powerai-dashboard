@@ -60,7 +60,51 @@ with crew2:
     st.metric("Crews Deployed", str(st.session_state.crews_deployed))
 st.markdown("---")
 
-# Search/Chatbot
+# Main layout
+left_col, right_col = st.columns([1,1])
+
+# Left Panel - Data Overview
+with left_col:
+    # Search functionality for table
+    search = st.text_input("🔍 Search Equipment", placeholder="Enter ID or name to filter the table...")
+
+    # Filter data based on search
+    filtered_data = st.session_state.data[
+        st.session_state.data['product_name'].str.contains(search, case=False) |
+        st.session_state.data['product_id'].str.contains(search, case=False)
+    ] if search else st.session_state.data
+
+    # Display data table
+    st.dataframe(
+        filtered_data,
+        height=600,
+        use_container_width=True
+    )
+
+# Right Panel - Map
+with right_col:
+    st.subheader("📍 Equipment Location Map")
+
+    # Create and display the map with click events
+    map_data = create_equipment_map(st.session_state.data)  # Use full dataset for map
+    map_events = st_folium(
+        map_data,
+        height=600,
+        width=None,
+        returned_objects=["last_clicked"]
+    )
+
+    # Handle map click events
+    if map_events["last_clicked"] and isinstance(map_events["last_clicked"], dict):
+        clicked_content = map_events["last_clicked"].get("popup", "")
+        if "ID:" in clicked_content:
+            equipment_id = clicked_content.split("ID:")[1].split("<br>")[0].strip()
+            if equipment_id != st.session_state.selected_equipment:
+                st.session_state.selected_equipment = equipment_id
+                st.experimental_rerun()
+
+# Chatbot section after the main layout
+st.markdown("---")
 user_input = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
 
 # Process chatbot input
@@ -72,21 +116,15 @@ if user_input:
         # Display response in a nice format
         st.info(response["recommendation"])
 
-        # Highlight recommended equipment
-        if response["selected_equipment"]:
-            st.session_state.selected_equipment = response["selected_equipment"]
-
-            # Update deployment numbers based on recommendation
+        # Update deployment numbers based on recommendation
+        if response.get("technicians_needed"):
             st.session_state.technicians_deployed += response["technicians_needed"]
             if response["technicians_needed"] >= 3:
                 st.session_state.crews_deployed += 1
-
-            # Force refresh to update metrics
             st.experimental_rerun()
 
     except Exception as e:
         st.error(f"Sorry, I couldn't process that request. Please try again.")
-
 
 # Sidebar for equipment details
 if st.session_state.selected_equipment is not None:
@@ -119,46 +157,6 @@ if st.session_state.selected_equipment is not None:
         if st.button("Close Details"):
             st.session_state.selected_equipment = None
             st.experimental_rerun()
-
-# Main layout
-left_col, right_col = st.columns([1,1])
-
-# Left Panel - Data Overview
-with left_col:
-    # Filter data based on search
-    filtered_data = st.session_state.data[
-        st.session_state.data['product_name'].str.contains(user_input, case=False) |
-        st.session_state.data['product_id'].str.contains(user_input, case=False)
-    ] if user_input else st.session_state.data
-
-    # Display data table
-    st.dataframe(
-        filtered_data,
-        height=600,
-        use_container_width=True
-    )
-
-# Right Panel - Map
-with right_col:
-    st.subheader("📍 Equipment Location Map")
-
-    # Create and display the map with click events
-    map_data = create_equipment_map(filtered_data)
-    map_events = st_folium(
-        map_data,
-        height=600,
-        width=None,
-        returned_objects=["last_clicked"]
-    )
-
-    # Handle map click events
-    if map_events["last_clicked"] and isinstance(map_events["last_clicked"], dict):
-        clicked_content = map_events["last_clicked"].get("popup", "")
-        if "ID:" in clicked_content:
-            equipment_id = clicked_content.split("ID:")[1].split("<br>")[0].strip()
-            if equipment_id != st.session_state.selected_equipment:
-                st.session_state.selected_equipment = equipment_id
-                st.experimental_rerun()
 
 # Footer
 st.markdown("---")
