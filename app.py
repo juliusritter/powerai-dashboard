@@ -35,8 +35,10 @@ with col1:
     st.metric("Total Equipment", f"{total_equipment:,}")
 
 with col2:
+    # Calculate network resilience as inverse of high risk percentage
     high_risk = len(st.session_state.data[st.session_state.data['risk_score'] >= 0.7])
-    st.metric("High Risk Equipment", f"{high_risk:,}", delta=f"{high_risk/total_equipment:.1%}")
+    resilience_percentage = ((total_equipment - high_risk) / total_equipment) * 100
+    st.metric("Network Resilience", f"{resilience_percentage:.1f}%")
 
 with col3:
     avg_age = st.session_state.data['age'].mean()
@@ -84,7 +86,7 @@ left_col, right_col = st.columns([1,1])
 # Left Panel - Data Overview
 with left_col:
     # Search and filter
-    search = st.text_input("🔍 Search Equipment", placeholder="Enter ID or name...")
+    search = st.text_input("🤖 Chatbot", placeholder="Ask me anything about the network...")
 
     # Filter data based on search
     filtered_data = st.session_state.data[
