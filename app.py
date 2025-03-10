@@ -171,7 +171,7 @@ with weather:
     # Calculate storm risk based on weather conditions
     storm_risk = "Low"
     warning_icon = "🔴"
-    
+
     # Check for storm conditions in forecast
     forecast = st.session_state.weather_data['forecast'].lower()
     if any(word in forecast for word in ['storm', 'thunder', 'lightning']):
@@ -182,7 +182,7 @@ with weather:
         warning_active = True
     else:
         warning_active = False
-    
+
     # Display weather info with enhanced styling
     st.markdown("""
     <style>
@@ -240,7 +240,7 @@ with weather:
         100% { opacity: 0.7; }
     }
     </style>
-    
+
     <div class="weather-container">
         <div class="weather-main">
             <div class="weather-icon">☀️</div>
